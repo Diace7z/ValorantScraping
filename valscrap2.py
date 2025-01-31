@@ -151,15 +151,12 @@ def mainbar(link, driver, div_nomor=3):
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[1]'
             value_agent = WebDriverWait(driver,5).until(EC.presence_of_element_located((By.XPATH, X_path))).text
             value_agent_final = value_agent[:value_agent.find('\n')]
-            overview.append(value_agent_final)
-        except:
-            overview.append(float("NoAgent"))
-        
-        try:
             value_agent_hours = value_agent.replace(',','')
             value_agent_hours = float(re.search(r'\d+', value_agent_hours).group())
+            overview.append(value_agent_final)
             overview.append(value_agent_hours)
         except:
+            overview.append(float("NoAgent"))
             overview.append(float(0))
         
         for j in range(2,8):
@@ -178,16 +175,13 @@ def mainbar(link, driver, div_nomor=3):
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[8]'
             value_map_raw = (WebDriverWait(driver,5).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
             value_map = value_map_raw[:value_map_raw.find('\n')]
-            overview.append(value_map)
-        except:
-            overview.append(float('NoMap'))
-            
-        try:
             value_map_wr = value_map_raw.replace(',','')
             value_map_wr = float(re.search(r'\d+', value_map_wr).group())
+            overview.append(value_map)
             overview.append(value_map_wr)
             
         except:
+            overview.append(float('NoMap'))
             overview.append(float(0))
         
     if n_nan_agents>0:
@@ -529,8 +523,9 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                     error_looper+=1
 
                 elif 'tracker.gg' in pagefound:
-                    time.sleep(300)
                     print('BOT DETECTED, sleep for 5 minutes')
+                    time.sleep(300)
+                    
                     
                 else:
                     try:
