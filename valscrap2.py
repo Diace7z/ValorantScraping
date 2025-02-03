@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,6 +10,25 @@ import datetime
 import math
 import random
 import re
+
+def div_assessment(div_nomor,driver):
+    link_assessment = [f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div[1]/span[1]',
+                       f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[5]/div[7]/div/div[2]/span[2]/span',
+                       f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[5]/div[7]/div/div[2]/span[2]/span']
+    false_count = 0
+    for xpath in link_assessment:
+        try:
+            element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        except:
+            false_count+=1
+    if false_count > 2:
+        print('Div nomor berubah')
+        if div_nomor == 3:
+            div_nomor = 4
+        else:
+            div_nomor = 3
+    return div_nomor
+            
 
 def numeric_extraction(text):
     """
@@ -127,7 +144,7 @@ def mainbar(link, driver, div_nomor=3):
     for i in list_xpath2:
         try:
             X_path = i
-            element = WebDriverWait(driver,5).until(EC.presence_of_element_located((By.XPATH, X_path)))
+            element = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path)))
             value = element.text
             value = value.replace(',','')
             value = float(re.search(r'\d+', value).group())
@@ -149,20 +166,20 @@ def mainbar(link, driver, div_nomor=3):
     for i in range(1,n_rows_agents*2,2):
         try:
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[1]'
-            value_agent = WebDriverWait(driver,5).until(EC.presence_of_element_located((By.XPATH, X_path))).text
+            value_agent = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path))).text
             value_agent_final = value_agent[:value_agent.find('\n')]
             value_agent_hours = value_agent.replace(',','')
             value_agent_hours = float(re.search(r'\d+', value_agent_hours).group())
             overview.append(value_agent_final)
             overview.append(value_agent_hours)
         except:
-            overview.append(float("NoAgent"))
+            overview.append("NoAgent")
             overview.append(float(0))
         
         for j in range(2,8):
             try:
                 X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[{j}]'
-                value = WebDriverWait(driver,5).until(EC.presence_of_element_located((By.XPATH, X_path))).text
+                value = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path))).text
                 value = element.text
                 value = value.replace(',','')
                 value = float(re.search(r'\d+', value ).group())
@@ -173,7 +190,7 @@ def mainbar(link, driver, div_nomor=3):
 
         try:
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[8]'
-            value_map_raw = (WebDriverWait(driver,5).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
+            value_map_raw = (WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
             value_map = value_map_raw[:value_map_raw.find('\n')]
             value_map_wr = value_map_raw.replace(',','')
             value_map_wr = float(re.search(r'\d+', value_map_wr).group())
@@ -181,7 +198,7 @@ def mainbar(link, driver, div_nomor=3):
             overview.append(value_map_wr)
             
         except:
-            overview.append(float('NoMap'))
+            overview.append('NoMap')
             overview.append(float(0))
         
     if n_nan_agents>0:
@@ -499,7 +516,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                     print('Page not available')
                     time.sleep(22+random.randint(0,1)*5)
                 except:
-                    print('Page available')
+                    None
                     
                 try:
                     elementprivate = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, path_private)))
@@ -507,14 +524,14 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                     print('Page privated')
                     time.sleep(22+random.randint(0,1)*5)
                 except:
-                    print('Page not privated')
+                    None
                     
                 try:
                     verify_detected = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, path_verify)))
                     pagefound = verify_detected.text
                     print('Page detected as bot')
                 except:
-                    print('Page not detected as bot')
+                    None
             
                 if (pagefound == "404"):
                     error_looper+=1
@@ -525,9 +542,9 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                 elif 'tracker.gg' in pagefound:
                     print('BOT DETECTED, sleep for 5 minutes')
                     time.sleep(300)
-                    
-                    
+                
                 else:
+                    div_nomor = div_assessment(div_nomor,driver)
                     try:
                         time.sleep(1)
                         all_bar =  [nickname.replace('\n','')]+mainbar(link, driver, div_nomor) + sidebar(link, driver, div_nomor) 
