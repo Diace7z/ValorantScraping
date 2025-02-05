@@ -75,15 +75,14 @@ def mainbar(link, driver, div_nomor=3):
         try:
             # Tunggu sampai elemen dengan XPath tertentu muncul
             X_Path = i
-            element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, X_Path)))
+            element = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, X_Path)))
             value = element.text
             if i != list_xpath1[0]:
-                value = value.replace(',','')
-                value = float(re.search(r'\d+', value ).group())
+                value = numeric_extraction(value)
                 overview.append(value)
             else:
                 if value == 'Rating':
-                    element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, 
+                    element = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, 
                     f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div[1]/span[2]')))
                     overview.append(element.text)
                 else:
@@ -101,10 +100,9 @@ def mainbar(link, driver, div_nomor=3):
                      #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div/div[2]/span[2]/span
                      #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div/div[2]/span[2]/span
                      #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div[2]/div[2]/div[1]/div[1]/div[3]/div[1]/div/div[2]/span[2]/span
-            element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, X_path)))
+            element = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, X_path)))
             value = element.text
-            value = value.replace(',','')
-            value = float(re.search(r'\d+', value ).group())
+            value = numeric_extraction(value)
             overview.append(value)
         except Exception as e:
             
@@ -117,10 +115,9 @@ def mainbar(link, driver, div_nomor=3):
             X_Path = f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[5]/div[{i}]/div/div[2]/span[2]/span'
                      #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div/div[2]/span[2]/span
                     
-            element = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, X_Path)))
+            element = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, X_Path)))
             value = element.text
-            value = value.replace(',','')
-            value = float(re.search(r'\d+', value ).group())
+            value = numeric_extraction(value)
             overview.append(value)
             
                        #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div[2]/div[2]/div[1]/div[1]/div[5]/div[1]/div/div[2]/span[2]/span
@@ -130,10 +127,9 @@ def mainbar(link, driver, div_nomor=3):
             
             try:
                 X_Path = f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[5]/div[{i}]/div/div[1]/span[2]/span'
-                element = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_Path)))
+                element = WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_Path)))
                 value = element.text
-                value = value.replace(',','')
-                value = float(re.search(r'\d+', value ).group())
+                value = numeric_extraction(value)
                 overview.append(value)
             except Exception as e:
                 overview.append(float("nan"))
@@ -144,10 +140,9 @@ def mainbar(link, driver, div_nomor=3):
     for i in list_xpath2:
         try:
             X_path = i
-            element = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path)))
+            element = WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path)))
             value = element.text
-            value = value.replace(',','')
-            value = float(re.search(r'\d+', value).group())
+            value = numeric_extraction(value)
             overview.append(value)
         except Exception as e:
             overview.append(float("nan"))
@@ -166,10 +161,9 @@ def mainbar(link, driver, div_nomor=3):
     for i in range(1,n_rows_agents*2,2):
         try:
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[1]'
-            value_agent = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path))).text
+            value_agent = WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path))).text
             value_agent_final = value_agent[:value_agent.find('\n')]
-            value_agent_hours = value_agent.replace(',','')
-            value_agent_hours = float(re.search(r'\d+', value_agent_hours).group())
+            value_agent_hours =numeric_extraction(value_agent)
             overview.append(value_agent_final)
             overview.append(value_agent_hours)
         except:
@@ -179,10 +173,9 @@ def mainbar(link, driver, div_nomor=3):
         for j in range(2,8):
             try:
                 X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[{j}]'
-                value = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path))).text
+                value = WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path))).text
                 value = element.text
-                value = value.replace(',','')
-                value = float(re.search(r'\d+', value ).group())
+                value = numeric_extraction(value)
                 overview.append(value)
                     
             except Exception as e:
@@ -190,10 +183,9 @@ def mainbar(link, driver, div_nomor=3):
 
         try:
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[8]'
-            value_map_raw = (WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
+            value_map_raw = (WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
             value_map = value_map_raw[:value_map_raw.find('\n')]
-            value_map_wr = value_map_raw.replace(',','')
-            value_map_wr = float(re.search(r'\d+', value_map_wr).group())
+            value_map_wr = value = numeric_extraction(value_map_wr)
             overview.append(value_map)
             overview.append(value_map_wr)
             
@@ -243,10 +235,9 @@ def sidebar(link,driver,div_nomor=3):
                 try:
                     list_path = f'div[1]/table/tbody/tr[{row}]/td[{col}]'
                     x_path = xpath_accuracy + list_path
-                    element = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, x_path)))
+                    element = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, x_path)))
                     value = element.text
-                    value = value.replace(',','')
-                    value = float(re.search(r'\d+', value ).group())
+                    value = numeric_extraction(value)
                     accuracy_list.append(value)
                     
                 except:
@@ -325,7 +316,6 @@ def sidebar(link,driver,div_nomor=3):
                     if (tail != path_tail[0]) or  (tail != path_tail[1]):
                         value = element
                         value = value.replace(',','')
-                        
                         try:
                             value = float(re.search(r'\d+', value ).group())
                             top_weapons_list.append(value)
@@ -377,8 +367,7 @@ def sidebar(link,driver,div_nomor=3):
                     element = driver.find_element(by='xpath', value=x_path).text
                     if tail != path_tail[0]:
                         value = element
-                        value = value.replace(',','')
-                        value = float(re.search(r'\d+', value ).group())
+                        value = numeric_extraction(value)
                         top_map_list.append(value)
                     else:
                         top_map_list.append(element)
@@ -391,7 +380,7 @@ def sidebar(link,driver,div_nomor=3):
     
     return sidebar_overview
 
-def id_collector(start=1, last=190,regions=["na", "eu", "ap","kr", "br", "latam"], episode='Current'):
+def id_collector(start=1, last=-1,regions=["na", "eu", "ap","kr", "br", "latam"], episode='Current'):
 
     Episode = {'Current':'', 'V25A1':'&act=476b0893-4c2e-abd6-c5fe-708facff0772',
               'E9A3':'&act=dcde7346-4085-de4f-c463-2489ed47983b',
@@ -399,49 +388,75 @@ def id_collector(start=1, last=190,regions=["na", "eu", "ap","kr", "br", "latam"
               'E9A1':'&act=52ca6698-41c1-e7de-4008-8994d2221209'} 
     
     tanggal = str(datetime.datetime.now())[:10]
-    tail_name = tanggal
+    tail_name = tanggal.replace('-','')
     driver = uc.Chrome()
     driver.maximize_window()
+    column_name = ['no','id','change','rr','tier']
+    last_0 = last
     for region in regions:
+        if last<0:
+            path_ = '//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div[1]/div/div[1]/span'
+            link = "https://tracker.gg/valorant/leaderboards/ranked/pc/default?region="+region+"&page="+str(1)+Episode[episode]
+            driver.get(link)
+            element_nod = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path_))).text
+            players = numeric_extraction(element_nod)
+            last = int(0.006*0.01*players)
+            print ('Halaman maksimal adalah: ',last)
+        else:
+            None
+        
         table = []
         no_data_text=''
         for page in range(start,last+1):
             t0 = time.time()
-            try:
-                driver.get("https://tracker.gg/valorant/leaderboards/ranked/pc/default?region="+region+"&page="+str(page)+Episode[episode])
-                try: 
-                    path_nod = '//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div/div/span'
-                    element_nod = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path_nod))).text
-                    if element_nod == 'No players to rank':
-                        break
-                    else:
-                        print('nothing')
+            while_loop = -1
+            while while_loop<0:
+                link = "https://tracker.gg/valorant/leaderboards/ranked/pc/default?region="+region+"&page="+str(page)+Episode[episode]
+                print(link)
+                driver.get(link)
+                pagefound = 'Found'
+                try:
+                    path_verify = '/html/body/div[1]/div/h1'
+                    verify_detected = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path_verify)))
+                    pagefound = verify_detected.text
+                    print('Page detected as bot')
+                    time.sleep(300)
                 except:
-                    print('table found')
-                table_XPath = '//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div/table/tbody/'
-                              #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div[]/table/tbody/tr[1]
-                              #//*[@id="app"]/div[2]/div[3]/div/main/div[4]/div[2]/div/div/div[1]/div/table
-                              #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div/table/tbody
-                num_rows = len(driver.find_elements(by='xpath', value=table_XPath + 'tr')) + 1
-                num_cols = len(driver.find_elements(by='xpath', value=table_XPath + 'tr[1]/td'))
-
-                for row in range(1,num_rows):
+                    while_loop+=1             
+            path_nod = '//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div/div/span'
+            element_nod = ''
+            try: 
+                element_nod = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path_nod))).text
+            except:
+                None
+    
+            if element_nod == 'No players to rank':
+                break
+            else:
+                print('table found')
+                try:
+                    table_XPath = '//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div/table/tbody/'
+                                      #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div[]/table/tbody/tr[1]
+                                      #//*[@id="app"]/div[2]/div[3]/div/main/div[4]/div[2]/div/div/div[1]/div/table
+                                      #//*[@id="app"]/div[2]/div[3]/div/main/div[3]/div[2]/div/div/div[1]/div/table/tbody
+                    num_rows = len(driver.find_elements(by='xpath', value=table_XPath + 'tr')) + 1
+                    num_cols = len(driver.find_elements(by='xpath', value=table_XPath + 'tr[1]/td'))
+                    for row in range(1,num_rows):
                         row_data = []
                         for col in range(1, num_cols):
                             text = driver.find_element(by='xpath', value=f'{table_XPath}tr[{row}]/td[{col}]').text
                             row_data.append(text)
                         table.append(row_data)
-                print("Page "+str(page)+" on region "+region+ " Clear!")
-            except:
-                print("Page "+str(page)+" on region "+region+ " Failed!")
-                
-            t1 = time.time()
-            print("Time Spent: ", t1-t0)
+                    print("Page "+str(page)+" on region "+region+ " Clear!")      
+                    df = pd.DataFrame(table)
+                    df.columns = column_name
+                    df.to_csv(f'val_ID_{region}_{episode}_{tail_name}_.csv')
+                    t1 = time.time()
+                    print("Time Spent: ", t1-t0)
+                except:
+                    print("Page "+str(page)+" on region "+region+ " Failed!")  
+        last = last_0
         print("Region "+region+" Clear!")
-        column_name = ['no','id','change','rr','tier']
-        df = pd.DataFrame(table)
-        df.columns = column_name
-        df.to_csv("valnames"+region+episode+tail_name+'.csv')
     driver.quit()
 
 def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str = 'Current',
@@ -476,8 +491,8 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
         print( f'lastest player of this program is no.{end}')
     else:
         print( f'lastest player of this program is no.{end}')
-        
-    file_name_akhir = nama_file_akhir+'scraped_overview_'+file_name
+    file_name = file_name[:(file_name.find('.csv'))]
+    file_name_akhir = 'overview_'+file_name+f'_{nama_file_akhir}.csv'
     
     """
     if file_name_akhir in os.listdir():
@@ -511,7 +526,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                 path_verify = '/html/body/div[1]/div/h1'
                 pagefound = 'Found'
                 try:
-                    element404 = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, path404)))
+                    element404 = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path404)))
                     pagefound = element404.text
                     print('Page not available')
                     time.sleep(22+random.randint(0,1)*5)
@@ -519,7 +534,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                     None
                     
                 try:
-                    elementprivate = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, path_private)))
+                    elementprivate = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path_private)))
                     pagefound = elementprivate.text
                     print('Page privated')
                     time.sleep(22+random.randint(0,1)*5)
@@ -527,7 +542,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                     None
                     
                 try:
-                    verify_detected = WebDriverWait(driver, 2).until(EC.presence_of_element_located((By.XPATH, path_verify)))
+                    verify_detected = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH, path_verify)))
                     pagefound = verify_detected.text
                     print('Page detected as bot')
                 except:
@@ -598,5 +613,5 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
     driver.quit()
     dtframe.clear()
     t1 = time.time()
-    print("Time spent (minute):", (t1-t0)/60)
+    print("Time spent (minute):", (t1-t0)/3600)
     
