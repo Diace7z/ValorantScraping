@@ -36,7 +36,7 @@ def numeric_extraction(text):
     value = float(re.search(r'\d+', value).group())
     """
     text = text.replace(',','')
-    text = float(re.search(r'\d+', text).group())
+    text = float('.'.join(re.findall(r'\d+', text)))
     return text
 
 
@@ -482,7 +482,6 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
     if nama_file_akhir=='':
         nama_file_akhir = str(input('Input akhir file:'))
         
-    print("VALO_SCRAPER V2.01")
     
     #START AND END POINT
     
@@ -510,6 +509,13 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
     systematic_listed = list_nickname[start_systematic::k]
     driver = uc.Chrome(headless=False,use_subprocess=True)
     driver.maximize_window()
+
+    data_region = 'Unidentified'
+    
+    for i in ["na", "eu", "ap","kr", "br", "latam"]:
+        if ('_'+i+'_') in file_name_akhir:
+            data_region = i
+    
     
     #Main Program: scrape each ID
     for nickname in systematic_listed:
@@ -562,7 +568,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                     div_nomor = div_assessment(div_nomor,driver)
                     try:
                         time.sleep(1)
-                        all_bar =  [nickname.replace('\n','')]+mainbar(link, driver, div_nomor) + sidebar(link, driver, div_nomor) 
+                        all_bar =  [nickname.replace('\n',''), data_region] +mainbar(link, driver, div_nomor) + sidebar(link, driver, div_nomor) 
                         print(all_bar)
                         dtframe.append(all_bar)
                         error_looper+=1
@@ -579,7 +585,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
         print(count)
         if pagefound == "Found":
             finished = pd.DataFrame(dtframe)    
-            finished.columns = (['nickname'] + ['rank','rank_rr','rank_rating','level', 'match', 'playtime_hours'] + 
+            kolom = (['nickname','region'] + ['rank','rank_rr','rank_rating','level', 'match', 'playtime_hours'] + 
                                 ['damage_round','kill_death_ratio','headshot_rate','winrate'] + 
                                 ['win', 'kast','damage_roun','kills','death','assist','acs',
                                  'kad_ratio','kill_round_ratio','first_blood','flawless_round','aces'] +  ['round_win'] + 
@@ -601,8 +607,10 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                                  'map_name5', 'win_rate5', 'win_lose5',
                                  'map_name6', 'win_rate6', 'win_lose6',
                                  'map_name7', 'win_rate7', 'win_lose7'])
+            finished.columns = kolom
             finished.to_csv(file_name_akhir)
             del finished
+            
         t1sub = time.time()
         driver.delete_all_cookies()
         driver.execute_script("window.localStorage.clear();")
@@ -610,8 +618,13 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
 
         print("Iteration time spent: ", t1sub-t0sub)
         time.sleep(random.randint(0,1) * 3.5)
+    
+    finished = pd.DataFrame(dtframe)
+    finished.columns = kolom
+    finished.to_csv(file_name_akhir)
     driver.quit()
     dtframe.clear()
     t1 = time.time()
-    print("Time spent (minute):", (t1-t0)/3600)
     
+    print("Time spent (hours):", (t1-t0)/3600)
+    return finished
