@@ -10,6 +10,7 @@ import datetime
 import math
 import random
 import re
+import os
 
 def div_assessment(div_nomor,driver):
     link_assessment = [f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[1]/div[1]/div[2]/div[2]/div/div[1]/div/div[1]/span[1]',
@@ -163,7 +164,7 @@ def mainbar(link, driver, div_nomor=3):
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[1]'
             value_agent = WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path))).text
             value_agent_final = value_agent[:value_agent.find('\n')]
-            value_agent_hours =numeric_extraction(value_agent)
+            value_agent_hours = numeric_extraction(value_agent)
             overview.append(value_agent_final)
             overview.append(value_agent_hours)
         except:
@@ -173,8 +174,7 @@ def mainbar(link, driver, div_nomor=3):
         for j in range(2,8):
             try:
                 X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[{j}]'
-                value = WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path))).text
-                value = element.text
+                value = WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path))).text
                 value = numeric_extraction(value)
                 overview.append(value)
                     
@@ -183,13 +183,14 @@ def mainbar(link, driver, div_nomor=3):
 
         try:
             X_path=f'//*[@id="app"]/div[2]/div[3]/div/main/div[{div_nomor}]/div[2]/div[2]/div[2]/div[2]/div/div/div[2]/div/div[{i}]/div[8]'
-            value_map_raw = (WebDriverWait(driver,1).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
+            value_map_raw = (WebDriverWait(driver,2).until(EC.presence_of_element_located((By.XPATH, X_path)))).text
             value_map = value_map_raw[:value_map_raw.find('\n')]
-            value_map_wr = value = numeric_extraction(value_map_wr)
+            value_map_wr = numeric_extraction(value_map_raw)
             overview.append(value_map)
             overview.append(value_map_wr)
             
-        except:
+        except Exception as e:
+            print(e)
             overview.append('NoMap')
             overview.append(float(0))
         
@@ -315,11 +316,11 @@ def sidebar(link,driver,div_nomor=3):
                     element = driver.find_element(by='xpath', value=x_path).text
                     if (tail != path_tail[0]) or  (tail != path_tail[1]):
                         value = element
-                        value = value.replace(',','')
                         try:
-                            value = float(re.search(r'\d+', value ).group())
+                            value = numeric_extraction(value)
                             top_weapons_list.append(value)
-                        except:
+                        except Exception as e:
+                            print(e)
                             top_weapons_list.append(element)
                     else:
                         top_weapons_list.append(element)
@@ -460,7 +461,7 @@ def id_collector(start=1, last=-1,regions=["na", "eu", "ap","kr", "br", "latam"]
     driver.quit()
 
 def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str = 'Current',
-                 file_name ='',nama_file_akhir='', div_nomor=3):
+                 file_name ='',nama_file_akhir='', div_nomor=3, replace_name = False):
     
     dtframe = []
     t0 = time.time()
@@ -490,8 +491,14 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
         print( f'lastest player of this program is no.{end}')
     else:
         print( f'lastest player of this program is no.{end}')
-    file_name = file_name[:(file_name.find('.csv'))]
-    file_name_akhir = 'overview_'+file_name+f'_{nama_file_akhir}.csv'
+
+    end = min(end,len(data_nama["id"]))
+
+    if replace_name:
+        file_name_akhir = nama_file_akhir + 'csv'
+    else:
+        file_name = file_name[:(file_name.find('.csv'))]
+        file_name_akhir = 'overview_'+file_name+f'_{nama_file_akhir}.csv'
     
     """
     if file_name_akhir in os.listdir():
@@ -513,7 +520,7 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
     data_region = 'Unidentified'
     
     for i in ["na", "eu", "ap","kr", "br", "latam"]:
-        if ('_'+i+'_') in file_name_akhir:
+        if ('_'+i+'_') in file_name:
             data_region = i
     
     
@@ -583,9 +590,14 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                 print("Mencoba mengulang...")
         count+=k
         print(count)
-        if pagefound == "Found":
-            finished = pd.DataFrame(dtframe)    
-            kolom = (['nickname','region'] + ['rank','rank_rr','rank_rating','level', 'match', 'playtime_hours'] + 
+        t1sub = time.time()
+        driver.delete_all_cookies()
+        driver.execute_script("window.localStorage.clear();")
+        driver.execute_script("window.sessionStorage.clear();")
+        print("Iteration time spent: ", t1sub-t0sub)
+        time.sleep(random.randint(0,1) * 1)
+
+    kolom = (['nickname','region'] + ['rank','rank_rr','rank_rating','level', 'match', 'playtime_hours'] + 
                                 ['damage_round','kill_death_ratio','headshot_rate','winrate'] + 
                                 ['win', 'kast','damage_roun','kills','death','assist','acs',
                                  'kad_ratio','kill_round_ratio','first_blood','flawless_round','aces'] +  ['round_win'] + 
@@ -607,17 +619,6 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
                                  'map_name5', 'win_rate5', 'win_lose5',
                                  'map_name6', 'win_rate6', 'win_lose6',
                                  'map_name7', 'win_rate7', 'win_lose7'])
-            finished.columns = kolom
-            finished.to_csv(file_name_akhir)
-            del finished
-            
-        t1sub = time.time()
-        driver.delete_all_cookies()
-        driver.execute_script("window.localStorage.clear();")
-        driver.execute_script("window.sessionStorage.clear();")
-
-        print("Iteration time spent: ", t1sub-t0sub)
-        time.sleep(random.randint(0,1) * 3.5)
     
     finished = pd.DataFrame(dtframe)
     finished.columns = kolom
@@ -628,3 +629,26 @@ def valo_scraper(start=0, end=-1, sample_population_rate= 0.20, episode_act:str 
     
     print("Time spent (hours):", (t1-t0)/3600)
     return finished
+
+def scraper(fold, rate, episode, data, name:str):
+    file_file = []
+    len_data = len(list((pd.read_csv(data))['id']))
+    n_part = int(len_data/fold)+1
+    
+    for i in range(0,n_part+1):
+        part_file = (name + 'part'+str(i+1))
+        if part_file in os.listdir():
+            file_file.append(part_file)
+        else:
+            valo_scraper(start= fold*i, end= fold*(i+1)-1, sample_population_rate= rate, episode_act = episode,
+                         file_name = data, nama_file_akhir= part_file, div_nomor=3, replace_name= True)
+            file_file.append(part_file)
+    
+    parts_df = []
+    for part in file_file:
+        parts_df.append(part)
+    df = pd.concat(parts_df)
+    df.to_csv(name+'csv')
+
+    for part in file_file:
+        os.remove(part)
