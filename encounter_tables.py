@@ -1,5 +1,19 @@
+import numpy as np
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import undetected_chromedriver as uc
+import time
+import datetime
+import math
+import random
+import re
+import os
+import winsound
 
-def encounter_tables(df = ,rename = )
+def encounter(df ,rename ):
     driver = uc.Chrome(headless=False,use_subprocess=True)
     driver.maximize_window()
     
@@ -20,7 +34,7 @@ def encounter_tables(df = ,rename = )
                 player = []
                 for column in data:
                     player.append(column.text)
-                tables.append(player)
+                tables_r.append(player)
                 print(player)
             
             
@@ -45,7 +59,11 @@ def encounter_tables(df = ,rename = )
                 print(player)
             tabel = tabel + tables_r
             time.sleep(10)
-        except:
+        except Exception as e:
+            print(e)
+            duration = 1000  # milliseconds
+            freq = 440  # Hz
+            winsound.Beep(freq, duration)
             time.sleep(32)
             driver.quit()
             driver = uc.Chrome(headless=False,use_subprocess=True)
@@ -63,3 +81,4 @@ def encounter_tables(df = ,rename = )
     
     df = df.drop_duplicates(subset='id')
     df.to_csv(rename)
+    return df
